@@ -1,19 +1,19 @@
 name := "SciFe"
 
-version := "1.2.9"
+version := "1.2.10"
 
 organization := "ch.epfl.lara"
 
 organizationName := "LARA/EPFL"
 
-organizationHomepage := Some(new URL("http://lara.epfl.ch"))
+organizationHomepage := Some(new URL("https://lara.epfl.ch"))
 
-scalaVersion := "2.11.4"
+scalaVersion := "2.12.17"
 
-// forcing the version
-ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
+// // forcing the version
+// ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
 
-scalaBinaryVersion := "2.11"
+scalaBinaryVersion := "2.12"
 
 // Compiler options
 scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature"/*, "-Ylog-classpath" */) 
@@ -23,12 +23,12 @@ javacOptions += "-Xlint:unchecked"
 // Testing libraries
 
 // ScalaCheck
-resolvers += "Sonatype Releases" at "http://oss.sonatype.org/content/repositories/releases"
+resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases"
 
 //libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.12.1" % "test"
-libraryDependencies += "org.scalacheck" % "scalacheck_2.11" % "1.12.1" % "test"
+libraryDependencies += "org.scalacheck" % "scalacheck_2.12" % "1.15.4" % "test"
 
-libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.2.4" % "test"
+libraryDependencies += "org.scalatest" % "scalatest_2.12" % "3.2.15" % "test"
 //libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.1" % "test"
 
 libraryDependencies += "junit" % "junit" % "4.11" % "test"
@@ -37,7 +37,7 @@ libraryDependencies += "junit" % "junit" % "4.11" % "test"
 libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % "test"
 
 // ScalaLogging
-libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0"
+libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.7.2"
 
 libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.7"
 //libraryDependencies += "com.typesafe" %% "scalalogging-log4j" % "1.0.1"
@@ -51,13 +51,15 @@ libraryDependencies ++= Seq(
 // ScalaMeter
 resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
-libraryDependencies += "com.storm-enroute" %% "scalameter" % "0.6"
+libraryDependencies += "com.storm-enroute" %% "scalameter" % "0.19" 
+
+dependencyOverrides += "org.scala-lang.modules" %% "scala-xml" % "2.1.0"
 
 // Kiama attribute grammars
-libraryDependencies += "com.googlecode.kiama" %% "kiama" % "1.7.0"
+libraryDependencies += "com.googlecode.kiama" %% "kiama" % "1.8.0" 
 
-// Check style
-org.scalastyle.sbt.ScalastylePlugin.Settings
+// // Check style
+// org.scalastyle.sbt.ScalastylePlugin.Settings
 
 // Combinatorics with collections
 libraryDependencies += "com.googlecode.combinatoricslib" % "combinatoricslib" % "2.1"
@@ -76,12 +78,13 @@ libraryDependencies += "org.jgrapht" % "jgrapht-core" % "0.9.0"
 //libraryDependencies += "org.jgrapht" % "jgrapht-dist" % "0.9.0"
 
 // Scalaz
-libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.1.0"
+libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.3.7"
+libraryDependencies += "org.scalaz.stream" %% "scalaz-stream" % "0.8.6"
 
 // Specs2
-libraryDependencies += "org.specs2" %% "specs2-core" % "3.0" % "test"
+libraryDependencies += "org.specs2" %% "specs2-core" % "4.19.2" % "test"
 
-resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
+resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 
 // in-program compilation calls
 libraryDependencies += "org.scala-lang" % "scala-compiler" % scalaVersion.value

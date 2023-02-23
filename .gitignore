@@ -37,3 +37,7 @@ project/plugins/project/
 
 # git
 *.orig
+
+.vscode/
+.metals/
+.bloop/
