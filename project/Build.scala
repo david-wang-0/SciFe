@@ -2,11 +2,10 @@ import sbt._
 import Keys._
 
 import scoverage._
-import scala.sys.process._
 
-object SciFeBuild {
+object SciFeBuild extends Build {
   
-  val preferredJVM = Some("jvm-1.8")
+  val preferredJVM = Some("jvm-1.7")
   
   lazy val root =
     Project("SciFe", file("."))
@@ -19,36 +18,36 @@ object SciFeBuild {
 //        fork := false,
 
         // test options 
-        Test / fork := true,
-        Test / javaOptions ++= Seq("-Xms2048m", "-Xmx2048m",
+        fork in Test := true,
+        javaOptions in Test ++= Seq("-Xms2048m", "-Xmx2048m",
           "-XX:MaxPermSize=512m", "-XX:+UseConcMarkSweepGC"),
         // verbose QuickCheck error ouput
-        Test / testOptions += Tests.Argument(TestFrameworks.ScalaCheck, "-verbosity", "3"),
+        testOptions in Test += Tests.Argument(TestFrameworks.ScalaCheck, "-verbosity", "3"),
         // exclude slow tests
-        Test / testOptions += noSlowTests,
+        testOptions in Test += noSlowTests,
         
         // benchmark options
         //unmanagedSourceDirectories in BenchConfig <+= sourceDirectory ( _ / "bench" ),
-        Test / unmanagedSourceDirectories += sourceDirectory ( _ / "bench" ).value,
+        unmanagedSourceDirectories in Test <+= sourceDirectory ( _ / "bench" ),
         // run only benchmark not dependent tests
-        BenchConfig / compile / sourceDirectories += sourceDirectory ( _ / "bench" ).value,
+        sourceDirectories in compile in BenchConfig <+= sourceDirectory ( _ / "bench" ),
         //sources in (BenchConfig, test) := Seq ( sourceDirectory.value / "bench" ),
-        BenchConfig / fork := false,        
-        BenchConfig / includeFilter := AllPassFilter,
-        BenchConfig / testOptions := Seq( benchmarksFilter/*, noSuiteFilter */ ),
+        fork in BenchConfig := false,        
+        includeFilter in BenchConfig := AllPassFilter,
+        testOptions in BenchConfig := Seq( benchmarksFilter/*, noSuiteFilter */ ),
 //        testOptions in BenchConfig += Tests.Filter({ (s: String) =>
 //          val isFull = s endsWith "Full"
 //          !isFull
 //        }),
-        BenchConfig / scalacOptions ++= generalScalacFlagList,
-        BenchConfig / scalacOptions ++= optimizedCompileScalacFlagsList,
+        scalacOptions in BenchConfig ++= generalScalacFlagList,
+        scalacOptions in BenchConfig ++= optimizedCompileScalacFlagsList,
         
         // ScalaMeter
-        BenchConfig / parallelExecution := false,
-        BenchConfig / testFrameworks += new TestFramework("org.scalameter.ScalaMeterFramework")
+        parallelExecution in BenchConfig := false,
+        testFrameworks in BenchConfig += new TestFramework("org.scalameter.ScalaMeterFramework")
         
         // Scoverage
-        , scoverage.ScoverageKeys.coverageExcludedPackages :=
+        , ScoverageSbtPlugin.ScoverageKeys.coverageExcludedPackages :=
           "<empty>;scife\\.util\\.*;scife\\.enumeration\\.util.*"+
           ";scife\\.util\\.format\\.*;scife\\.util\\.logging\\.*"
       )
@@ -74,45 +73,45 @@ object SciFeBuild {
       case "full" =>
         val fullState =
           append(Seq(
-            BenchConfig / testOptions := (BenchConfig / testOptions).value diff Seq(noSuiteFilter),
-            BenchConfig / testOptions += Tests.Filter(_ endsWith "Full")), state)
-        Project.runTask(BenchConfig / test, fullState)
+            testOptions in BenchConfig := (testOptions in BenchConfig).value diff Seq(noSuiteFilter),
+            testOptions in BenchConfig += Tests.Filter(_ endsWith "Full")), state)
+        Project.runTask(test in BenchConfig, fullState)
         // return the same state (not the modified one with filters)
         state
       case "minimal" | "simple" =>
         val minState =          
           append(Seq(
-            BenchConfig / testOptions := (BenchConfig / testOptions).value diff Seq(noSuiteFilter),
-            BenchConfig / testOptions += Tests.Filter(_ endsWith "Minimal")
+            testOptions in BenchConfig := (testOptions in BenchConfig).value diff Seq(noSuiteFilter),
+            testOptions in BenchConfig += Tests.Filter(_ endsWith "Minimal")
           ), state)
-        Project.runTask(BenchConfig / test, minState)
+        Project.runTask(test in BenchConfig, minState)
         state
       case "measure" =>
         val measureState =          
           append(Seq(
-            BenchConfig / testOptions := (BenchConfig / testOptions).value diff Seq(noSuiteFilter),
-            BenchConfig / testOptions += Tests.Filter(_ endsWith "Measure")
+            testOptions in BenchConfig := (testOptions in BenchConfig).value diff Seq(noSuiteFilter),
+            testOptions in BenchConfig += Tests.Filter(_ endsWith "Measure")
           ), state)
-        Project.runTask(BenchConfig / test, measureState)
+        Project.runTask(test in BenchConfig, measureState)
         state
       case "profile" =>
         val profileState =          
           append(Seq(
-            BenchConfig / testOptions := (Test / testOptions).value diff Seq(noSlowTests),
-            BenchConfig / testOptions += Tests.Filter(_ contains "Profile"),
+            testOptions in BenchConfig := (testOptions in Test).value diff Seq(noSlowTests),
+            testOptions in BenchConfig += Tests.Filter(_ contains "Profile"),
             // for one JVM
-            BenchConfig / test / fork := true,
-            BenchConfig / test / javaOptions := profileJVMFlagList ++ remoteConnectionJVMFlagList
+            fork in test in BenchConfig  := true,
+            javaOptions in test in BenchConfig := profileJVMFlagList ++ remoteConnectionJVMFlagList
           ), state)
-        Project.runTask(BenchConfig / test, profileState)
+        Project.runTask(test in BenchConfig, profileState)
         state
       case "slow" =>
         val slowState =          
-          append(Seq(BenchConfig / testOptions += Tests.Filter(_ endsWith "Slow")), state)
-        Project.runTask(BenchConfig / test, slowState)
+          append(Seq(testOptions in BenchConfig += Tests.Filter(_ endsWith "Slow")), state)
+        Project.runTask(test in BenchConfig, slowState)
         slowState
       case "debug" =>
-        Project.runTask(BenchConfig / test, state)
+        Project.runTask(test in BenchConfig, state)
         state
       case _ =>
         state.fail
