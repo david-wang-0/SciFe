@@ -79,7 +79,7 @@ libraryDependencies += "org.jgrapht" % "jgrapht-core" % "0.9.0"
 libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.1.0"
 
 // Specs2
-libraryDependencies += "org.specs2" %% "specs2-core" % "3.0" % "test"
+libraryDependencies += "org.specs2" %% "specs2-core" % "4.10.6" % "test"
 
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
 
